@@ -24,8 +24,10 @@ use App\Http\Controllers\HomeController;
 
 // Ruta Agrupada
 Route::controller(HomeController::class)->group(function(){
-    Route::get('/', 'index');
-    Route::post('/crear', 'create');
+    Route::get('/', 'index')->name('index');
+    Route::post('/crear', 'create')->name('crear');
+    Route::post('/eliminar', 'delete')->name('eliminar');
+    Route::post('/completar', 'complete')->name('completar');
 });
 
 // Route::get('/curso/{curso}', function($curso) {

@@ -3,6 +3,7 @@
 namespace App\Http\Controllers;
 
 use Illuminate\Http\Request;
+use Illuminate\Http\Response;
 
 class Todo {
     private $fechaFinalizacion;
@@ -49,23 +50,80 @@ class HomeController extends Controller
 
     # Mostrar página principal
     public function index(){
-        // return "Bienvenido a la página principal";
-        return view('home/index', ["lista_tareas" => []]);
+        
+        // Obtén la lista de tareas desde la sesión
+        $lista_tareas = session()->get('tareas', []);
+
+        return view('home/index',
+            [
+                "lista_tareas" => $lista_tareas,
+            ]);
     }
 
     # Mostrar formularios
     public function create(Request $request){
+
+        // Obtén el arreglo existente de la sesión o crea uno nuevo si no existe
+        $tareas = session()->get('tareas', []);
+
         $fecha_finalizacion = $request->input('fecha_finalizacion');
         $nombre = $request->input('nombre');
 
         $nueva_tarea = new Todo($fecha_finalizacion, $nombre);
 
+        // Agrega la nueva tarea al arreglo
+        $tareas[] = $nueva_tarea;
 
-        return $nueva_tarea;
+        // Guarda el arreglo actualizado en la sesión
+        session()->put('tareas', $tareas);
+
+        return redirect()->action([HomeController::class, 'index'])->with('success', 'Tarea creada con éxito');
+
     }
 
-    # Mostrar algo en particular
-    public function show($pagina){
-        return "Bienvenido a $pagina";
+    public function complete(Request $request){
+
+        // Obtén el arreglo existente de la sesión o crea uno nuevo si no existe
+        $lista_tareas = session()->get('tareas', []);
+
+        $index = $request->input('index');
+
+        if ($index === null || !array_key_exists($index, $lista_tareas) || $lista_tareas[$index] === null) {
+            return response()->json(['message' => 'Índice no encontrado', 'success' => false]);
+        }
+
+        $objeto = $lista_tareas[$index];
+        $objeto->setCompletado(true);
+        $lista_tareas[$index] = $objeto;
+
+        session()->put('tareas', $lista_tareas);
+
+        return response()->json(['message' => 'Tarea completada correctamente', 'index' => $index, 'success' => true]);
+
     }
+
+    public function delete(Request $request){
+
+        // Obtén el arreglo existente de la sesión o crea uno nuevo si no existe
+        $lista_tareas = session()->get('tareas', []);
+
+        $index = $request->input('index');
+
+        if ($index == null) {
+            return response()->json(['message' => 'Índice no encontrado', 'success' => false]);
+        }
+
+        unset($lista_tareas[$index]);
+
+        session()->put('tareas', $lista_tareas);
+
+        return response()->json(['message' => 'Tarea eliminada correctamente', 'index' => $index, 'success' => true]);
+
+    }
+
+
+    // # Mostrar algo en particular
+    // public function show($pagina){
+    //     return "Bienvenido a $pagina";
+    // }
 }
