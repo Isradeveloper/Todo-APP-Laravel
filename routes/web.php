@@ -28,6 +28,7 @@ Route::controller(HomeController::class)->group(function(){
     Route::post('/crear', 'create')->name('crear');
     Route::post('/eliminar', 'delete')->name('eliminar');
     Route::post('/completar', 'complete')->name('completar');
+    Route::post('/pendiente', 'pending')->name('pendiente');
 });
 
 // Route::get('/curso/{curso}', function($curso) {

@@ -19,6 +19,7 @@
     <script>
         const urlEliminar = "{{ route('eliminar') }}";
         const urlCompletar = "{{ route('completar') }}";
+        const urlPendiente = "{{ route('pendiente') }}";
         const token = "{{ csrf_token() }}"
     </script>   
     <script src="{{ asset('resources/js/index.js') }}"></script>
